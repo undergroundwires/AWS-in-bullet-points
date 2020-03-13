@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "Gowtham-Github",
+      "name": "Gowtham",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/56188220?v=4",
+      "profile": "https://github.com/Gowtham-Github",
+      "contributions": [
+        "doc"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "AWS-in-bullet-points",
+  "projectOwner": "undergroundwires",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
