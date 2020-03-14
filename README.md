@@ -6,7 +6,7 @@
 - The notes are comprehensive and written with goal of covering all exam areas.
   - I passed the exam with 956/1000 score with these notes.
 - Good luck & enjoy studying! ☕
-- ✨ Contributions of any kind welcome!
+- ✨ Contributions of any kind are welcome!
 
 ## Symbols
 
