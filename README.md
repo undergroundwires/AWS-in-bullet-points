@@ -1,6 +1,8 @@
 # AWS in bullet points
 
-[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/undergroundwires/SafeOrbit/issues) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section --> [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-) <!-- ALL-CONTRIBUTORS-BADGE:END -->
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/undergroundwires/SafeOrbit/issues) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 - This repo contains study notes for different AWS exams.
 - The notes are comprehensive and written with goal of covering all exam areas.
@@ -83,6 +85,7 @@ Thanks goes to these wonderful people:
 <table>
   <tr>
     <td align="center"><a href="https://github.com/Gowtham-Github"><img src="https://avatars2.githubusercontent.com/u/56188220?v=4" width="100px;" alt=""/><br /><sub><b>Gowtham</b></sub></a><br /><a href="https://github.com/undergroundwires/AWS-in-bullet-points/commits?author=Gowtham-Github" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://erkinekici.com"><img src="https://avatars0.githubusercontent.com/u/15555035?v=4" width="100px;" alt=""/><br /><sub><b>undergroundwires</b></sub></a><br /><a href="#content-undergroundwires" title="Content">🖋</a> <a href="https://github.com/undergroundwires/AWS-in-bullet-points/pulls?q=is%3Apr+reviewed-by%3Aundergroundwires" title="Reviewed Pull Requests">👀</a> <a href="#maintenance-undergroundwires" title="Maintenance">🚧</a> <a href="#infra-undergroundwires" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
   </tr>
 </table>
 
