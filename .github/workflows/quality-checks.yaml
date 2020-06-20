@@ -4,29 +4,58 @@ on: [push, pull_request]
 
 jobs:
 
-  validate-docs:
+  validate-internal-links:
     runs-on: ubuntu-latest
     steps:
-      - 
-        name: Checkout
+      -  name: Checkout
         uses: actions/checkout@v2
-      -
-        name: Setup node
+      - name: Setup node
         uses: actions/setup-node@v1
         with:
           node-version: '14.x'
-      -
-        name: Install remark
-        run: npm install --global remark-cli
-      -
-        name: Ensure internal links are working
+      - name: Install dependencies
+        run: npm install --global remark-cli remark-validate-links
+      - name: Ensure internal links are working
         run: npm install --global remark-validate-links && remark . --frail --use remark-validate-links
-      -
-        name: Ensure external links are working
-        run: npm install --global remark-lint-no-dead-urls && remark . --frail --use remark-lint-no-dead-urls
-      -
-        name: Enforce markdown standards
-        run: npm install --global markdownlint-cli && markdownlint **/*.md
-      -
-        name: Ensure consistency
-        run: npm install --global remark-preset-lint-consistent && remark . --frail --use remark-preset-lint-consistent
+  
+  validate-external-links:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+      - name: Install dependencies
+        run: npm install --global remark-cli remark-lint-no-dead-urls
+      - name: Ensure external links are working
+        run: remark . --frail --use remark-lint-no-dead-urls
+  
+  lint-markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+      - name: Install dependencies
+        run: npm install --global markdownlint-cli
+      - name: Enforce markdown standards
+        run: remark . --frail --use remark-lint-no-dead-urls
+
+  ensure-consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+      - name: Install dependencies
+        run: npm install --global remark-cli remark-preset-lint-consistent
+      - name: Ensure consistency
+        run:  remark . --frail --use remark-preset-lint-consistent
