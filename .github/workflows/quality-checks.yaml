@@ -14,9 +14,9 @@ jobs:
         with:
           node-version: '14.x'
       - name: Install dependencies
-        run: npm install --global remark-cli remark-validate-links
+        run: npm ci
       - name: Ensure internal links are working
-        run: npm install --global remark-validate-links && remark . --frail --use remark-validate-links
+        run: npm run lint:relative-urls
   
   validate-external-links:
     runs-on: ubuntu-latest
@@ -28,9 +28,9 @@ jobs:
         with:
           node-version: '14.x'
       - name: Install dependencies
-        run: npm install --global remark-cli remark-lint-no-dead-urls
+        run: npm ci
       - name: Ensure external links are working
-        run: remark . --frail --use remark-lint-no-dead-urls
+        run: npm run lint:external-urls
   
   lint-markdown:
     runs-on: ubuntu-latest
@@ -42,9 +42,9 @@ jobs:
         with:
           node-version: '14.x'
       - name: Install dependencies
-        run: npm install --global markdownlint-cli
+        run: npm ci
       - name: Enforce markdown standards
-        run: markdownlint **/*.md
+        run: npm run lint:md
 
   ensure-consistency:
     runs-on: ubuntu-latest
@@ -56,6 +56,6 @@ jobs:
         with:
           node-version: '14.x'
       - name: Install dependencies
-        run: npm install --global remark-cli remark-preset-lint-consistent
+        run: npm ci
       - name: Ensure consistency
-        run:  remark . --frail --use remark-preset-lint-consistent
+        run: npm run lint:consistency

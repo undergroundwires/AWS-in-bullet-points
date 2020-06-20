@@ -2,14 +2,14 @@
 
 [![Quality checks status](https://github.com/undergroundwires/AWS-in-bullet-points/workflows/Quality%20checks/badge.svg)](https://github.com/undergroundwires/AWS-in-bullet-points/actions)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/undergroundwires/AWS-in-bullet-points/issues) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributing)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 - This repo contains study notes for different AWS exams.
 - The notes are comprehensive and written with goal of covering all exam areas.
   - I passed the exam with 956/1000 score with these notes.
 - Good luck & enjoy studying! ☕
-- ✨ Contributions of any kind are welcome!
+- ✨ Contributions of any kind are welcome, see [contributing](#contributing)
 
 ## Symbols
 
@@ -76,7 +76,7 @@
 13. [Well Architected Framework](./saa/13.%20Well%20Architected%20Framework.md)
 14. [Exam Readiness](./saa/14.%20Exam%20Readiness.md)
 
-## Contributors ✨
+## Contributing
 
 Thanks goes to these wonderful people:
 
