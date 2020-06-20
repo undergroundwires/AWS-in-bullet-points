@@ -1,0 +1,32 @@
+name: Quality checks
+
+on: [push, pull_request]
+
+jobs:
+
+  validate-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+      -
+        name: Install remark
+        run: npm install --global remark-cli
+      -
+        name: Ensure internal links are working
+        run: npm install --global remark-validate-links && remark . --frail --use remark-validate-links
+      -
+        name: Ensure external links are working
+        run: npm install --global remark-lint-no-dead-urls && remark . --frail --use remark-lint-no-dead-urls
+      -
+        name: Enforce markdown standards
+        run: npm install --global markdownlint-cli && markdownlint **/*.md
+      -
+        name: Ensure consistency
+        run: npm install --global remark-preset-lint-consistent && remark . --frail --use remark-preset-lint-consistent
