@@ -4,50 +4,15 @@ on: [push, pull_request]
 
 jobs:
 
-  validate-internal-links:
+  lint:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup node
-        uses: actions/setup-node@v1
-        with:
-          node-version: '14.x'
-      - name: Install dependencies
-        run: npm ci
-      - name: Ensure internal links are working
-        run: npm run lint:relative-urls
-  
-  validate-external-links:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup node
-        uses: actions/setup-node@v1
-        with:
-          node-version: '14.x'
-      - name: Install dependencies
-        run: npm ci
-      - name: Ensure external links are working
-        run: npm run lint:external-urls
-  
-  lint-markdown:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup node
-        uses: actions/setup-node@v1
-        with:
-          node-version: '14.x'
-      - name: Install dependencies
-        run: npm ci
-      - name: Enforce markdown standards
-        run: npm run lint:md
-
-  ensure-consistency:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lint-command:
+          - npm run lint:md
+          - npm run lint:relative-urls
+          - npm run lint:external-urls
+          - npm run lint:consistency
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -58,4 +23,4 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Ensure consistency
-        run: npm run lint:consistency
+        run: ${{ matrix.lint-command }}
