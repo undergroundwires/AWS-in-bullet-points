@@ -7,7 +7,7 @@ jobs:
   validate-internal-links:
     runs-on: ubuntu-latest
     steps:
-      -  name: Checkout
+      - name: Checkout
         uses: actions/checkout@v2
       - name: Setup node
         uses: actions/setup-node@v1
