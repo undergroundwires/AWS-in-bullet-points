@@ -44,7 +44,7 @@ jobs:
       - name: Install dependencies
         run: npm install --global markdownlint-cli
       - name: Enforce markdown standards
-        run: remark . --frail --use remark-lint-no-dead-urls
+        run: markdownlint **/*.md
 
   ensure-consistency:
     runs-on: ubuntu-latest
