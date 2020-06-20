@@ -1,15 +1,13 @@
 # AWS in bullet points
 
 [![Quality checks status](https://github.com/undergroundwires/AWS-in-bullet-points/workflows/Quality%20checks/badge.svg)](https://github.com/undergroundwires/AWS-in-bullet-points/actions)
-[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/undergroundwires/AWS-in-bullet-points/issues) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributing)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/undergroundwires/AWS-in-bullet-points/issues)
 
 - This repo contains study notes for different AWS exams.
 - The notes are comprehensive and written with goal of covering all exam areas.
   - I passed the exam with 956/1000 score with these notes.
 - Good luck & enjoy studying! ☕
-- ✨ Contributions of any kind are welcome, see [contributing](#contributing)
+- ✨ Contributions of any kind are welcome!
 
 ## Symbols
 
@@ -75,21 +73,3 @@
 12. [Other services](./saa/12.%20Other%20services.md)
 13. [Well Architected Framework](./saa/13.%20Well%20Architected%20Framework.md)
 14. [Exam Readiness](./saa/14.%20Exam%20Readiness.md)
-
-## Contributing
-
-Thanks goes to these wonderful people:
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tr>
-    <td align="center"><a href="https://github.com/Gowtham-Github"><img src="https://avatars2.githubusercontent.com/u/56188220?v=4" width="100px;" alt=""/><br /><sub><b>Gowtham</b></sub></a><br /><a href="https://github.com/undergroundwires/AWS-in-bullet-points/commits?author=Gowtham-Github" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://erkinekici.com"><img src="https://avatars0.githubusercontent.com/u/15555035?v=4" width="100px;" alt=""/><br /><sub><b>undergroundwires</b></sub></a><br /><a href="#content-undergroundwires" title="Content">🖋</a> <a href="https://github.com/undergroundwires/AWS-in-bullet-points/pulls?q=is%3Apr+reviewed-by%3Aundergroundwires" title="Reviewed Pull Requests">👀</a> <a href="#maintenance-undergroundwires" title="Maintenance">🚧</a> <a href="#infra-undergroundwires" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
-  </tr>
-</table>
-
-<!-- markdownlint-enable -->
-<!-- prettier-ignore-end -->
-<!-- ALL-CONTRIBUTORS-LIST:END -->
