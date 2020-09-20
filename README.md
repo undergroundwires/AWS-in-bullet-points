@@ -50,7 +50,7 @@
 7. [CDN - CloudFront](./saa/7.%20CDN%20-%20CloudFront.md)
 8. High Availability
    1. [High Availability and Scalability](./saa/8.1.%20High%20Availability%20-%20High%20Availability%20and%20Scalability.md)
-   2. [Load Balancers (ELB & ALB)](./saa/8.2.%20High%20Availability%20-%20Load%20Balancers%20(ELB%20&%20ALB).md)
+   2. [Load Balancers (ELB, CLB, NLB and ALB)](./ssa/../saa/8.2.%20High%20Availability%20-%20Load%20Balancers%20(ELB,%20CLB,%20NLB%20and%20ALB).md)
    3. [Scalability (ASG)](./saa/8.3.%20High%20Availability%20-%20Scalability%20(ASG).md)
    4. [Disaster Recovery](./saa/8.4.%20High%20Availability%20-%20Disaster%20Recovery.md)
    5. [Infrastructure as Code](./saa/8.5.%20High%20Availability%20-%20Infrastructure%20as%20Code.md)
