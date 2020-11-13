@@ -16,7 +16,7 @@
     | Symbol | Description |
     |:------:|-------------|
     | 💡 | Best practice or an important solution |
-    | ❗ | An important limitation, challange or an exception |
+    | ❗ | An important limitation, challenge or an exception |
     | 📝 | Common exam area |
     | 🤗 | Fact / trivia (most likely unrelated to the exam) |
 
