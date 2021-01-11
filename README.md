@@ -13,12 +13,12 @@
 
 - There are some symbols used throughout the documentation:
 
-    | Symbol | Description |
-    |:------:|-------------|
-    | 💡 | Best practice or an important solution |
-    | ❗ | An important limitation, challenge or an exception |
-    | 📝 | Common exam area |
-    | 🤗 | Fact / trivia (most likely unrelated to the exam) |
+  | Symbol | Description |
+  |:------:|-------------|
+  | 💡 | Best practice or an important solution |
+  | ❗ | An important limitation, challenge or an exception |
+  | 📝 | Common exam area |
+  | 🤗 | Fact / trivia (most likely unrelated to the exam) |
 
 ## Content
 
