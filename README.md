@@ -1,7 +1,7 @@
 # AWS in bullet points
 
 [![Quality checks status](https://github.com/undergroundwires/AWS-in-bullet-points/workflows/Quality%20checks/badge.svg)](https://github.com/undergroundwires/AWS-in-bullet-points/actions)
-[![GitHub sponsors](https://undergroundwires.dev/img/badges/donate/flat.svg)](https://undergroundwires.dev/donate?project=AWS-in-bullet-points)
+[![GitHub sponsors](https://undergroundwires.dev/img/badges/donate/flat.svg)](https://undergroundwires.dev/donate/?project=AWS-in-bullet-points)
 
 - This repo contains study notes for different AWS exams.
 - The notes are comprehensive and written with goal of covering all exam areas.
@@ -77,7 +77,6 @@
 
 - ⭐️ Simplest way to say thanks is just to it a star 🤩
 - ❤️ To show more support:
-  - ☕️ [buy me a coffee](https://buymeacoffee.com/undergroundwire)
   - 👏🏿 [sponsor me](https://github.com/sponsors/undergroundwires)
-  - 🎈 [donate using another way](https://undergroundwires.dev/donate)
+  - 🎈 [buy me a coffee](https://undergroundwires.dev/donate/)
 - ✨ Contributions of any kind are welcome!
