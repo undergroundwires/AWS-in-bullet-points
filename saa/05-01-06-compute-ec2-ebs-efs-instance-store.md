@@ -1,0 +1,319 @@
+# EC2 Storage (EBS, EFS & Instance Store)
+
+- AWS Storage Cloud Native Options
+  - **Block** (volumes): Amazon EBS, EC2 Instance Store
+  - **File** (network file system): [Amazon EFS](#amazon-elastic-file-system)
+  - **Object**: S3, Glacier
+- **Root Volumes**
+  - Root volumes are ephemeral by default i.e. gets deleted when instance is terminated.
+  - Both instance store and EFS can be root volume.
+    - When you launch an instance, the *root device volume* contains the image used to boot the instance.
+    - **EBS** is recommended over **Instance store** as it launches faster and is more consistent.
+
+## Block device mapping
+
+- **Block device**
+  - Moves data in sequences of bytes or bits, allows random access.
+  - E.g. CD-ROM, flash drives, hard disks.
+  - Two supported block devices in AWS:
+    - [Instance store](#instance-store)
+    - [EBS volumes](#ebs-elastic-block-store)
+- **Block device mapping**
+  - Allows block devices to attach to an EC2.
+  - Can be defined when you launch an instance (or in [AMI](./05-01-05-compute-ec2-amis.md#ec2-amis))
+  - Allows you to attach additional EBS volumes during and after launch
+    - ❗ Cannot attach instance stores after launching an instance.
+    - ❗ Additional volumes are not marked for deletion upon instance termination.
+
+## EC2 storage types
+
+- Include
+  - **[EBS](#ebs-elastic-block-store)**: Elastic Block Store
+  - **[EFS](#amazon-elastic-file-system)**: Elastic File System
+  - **[Amazon FSx](#amazon-fsx)**: 📝 EFS for Windows.
+- Comparison
+
+  | Type | When to use | Snapshots | Scaling |
+  | ---- | ----------- | --------- | ------- |
+  | [**EBS**](#ebs-elastic-block-store) | Storing data in single instance | In S3 | Can scale volume type & size (available ratios - 3:1 & 50:1 for IOPS per GB), no downtime but needs OS repartitioning |
+  | [**EFS**](#amazon-elastic-file-system) | Storing data in distributed applications | Not supported | Auto-scaling |
+  | [Instance store](#instance-store) | High performance IOPS when persistance is not needed | Not supported | Cannot resize |
+
+### Instance store
+
+- Actual root volume of some instances (some others come with EBS volumes)
+- 📝 Ephemeral (temporary) storage physically attached to the machine
+  - ❗ You lose data when instance is terminated or stopped
+    - But data survives reboots
+    - Unexpected terminations might happen from time to time (AWS will e-mail you)
+  - Cannot be detached or reattached i.e. remapped to another instances
+- 📝 Higher performance (millions of IOPS)
+  - It has better I/O than EBS as it's not a network drive which EBS is
+- 💡 Choose instance store if you can handle losing data e.g. caches otherwise EBS
+- ❗ No managed backups, cannot resize.
+- ❗ You can't attach instance store volumes to an instance after you've launched it
+
+### Amazon Elastic File System
+
+- Also known as *EFS*
+- Managed NFS (network file system)
+- POSIX compliant
+  - POSIX = Portable Operating System Interface for Unix
+  - It supports Unix APIs but it's ❗ Linux only
+  - 💡 POSIX permissions allows you to restrict access from hosts by user and group
+- More expensive than EBS (≈ 3x [`gp2` (EBS)](#ebs-volume-types))
+- Can be mounted on hundreds of instances
+  - ❗ Is not attached, it's mounted!
+  - Use ENI (Elastic Network Interface) to reveal EFS (elastic file storage) for multiple different EC2 instances.
+  - **Configurations**
+    1. Set Linux file system permissions on the presented EFS volume using `chmod` and `chown`.
+    2. Mount EFS volume to your EC2 instance using `mount -t nfs -o xxxx`.
+    3. Configure a Security Group to allow data traffic on port `2049`
+       - in EFS SG to connect to the EFS target.
+       - in EC2 SG to connect to the EC2 server.
+- Can be mounted to on-prem using AWS Direct Connect
+  - Allows you to migrate data from on-prem servers to EFS (EFS File Sync) or/and use it for backup solution.
+- Pay per use (not for provisioned space)
+- Region-specific
+  - 💡 [AWS DataSync](./09-migrations-discovery-migration-hub-migration-evaluator-application-discovery-service-database-migration-service-application-migration-service-app2container-datasync.md#aws-datasync) can be used to sync data in different EFS in different regions.
+- **Scalability**
+  - **Auto-scaling** without provisioning capacity.
+    - Elastic storage capacity: can grow and shrink based on the needs (files)
+  - Ability to burst up to multiple GB/s for short periods of time.
+- **Availability**
+  - **Multi-AZ**
+    - Data is stored across multiple AZ within a region.
+    - Each EFS instance in AZ get IP address
+- **Connections**: **Multi-region** or **hybrid** through AWS VPN and Inter-Region VPC Peering.
+- Uses NFS v4.1 protocol
+  - Allow inbound (NFS -> TCP 204) from EC2 instances in security group of EFS
+- Configurations:
+  - Performance mode
+    1. ***General purpose*** (default)
+    2. ***Max I/O*** - used when thousands of EC2 are using the EFS - higher latency & more IO.
+  - Throughput mode
+    1. ***Bursting***: Recommended for most file systems
+    2. ***Provisioned***: Use when throughput from bursting is not enough
+- Backup EFS-to-EFS (incremental - can choose frequency)
+- **Give per user access**
+  1. Create a subdirectory for each user
+  2. Grant read-write-execute permissions to the users.
+  3. Mount the subdirectory to the users' home directory
+- Serverless fully elastic store
+- Availability options:
+  - EFS Standard-IA (multi-AZ)
+  - EFS One Zone-IA (up to 92% cheaper)
+- Encryption at rest using KMS keys
+- 💡 Choose when you need to share files e.g. on-prem sync to sync, content management, web serving, data sharing, Wordpress.
+
+### EBS (Elastic Block Store)
+
+- Also known as *Amazon EBS* or *Amazon Elastic Block Store*.
+- Local storage -> 📝 Can be mounted on a single instance.
+- Network drive (little latency for network communication to the instance)
+  - You can attach to your instances while they run.
+    - As there's no filesystem on device so you must create one & mount it, [check documentation](https://docs.aws.amazon.com/ebs/latest/userguide/ebs-using-volumes.html).
+  - Persists data but can requires to set deletion on EC2 termination to false
+- Can be root volume
+  - ❗📝 Gets terminated by default if EC2 is terminated -> Can be disabled
+- Can be detached & re-attached.
+- 💡 Cheaper than [EFS (Elastic File System)](#amazon-elastic-file-system)
+- Portable
+  - E.g. if one EC2 fails, you can detach volume and attach it on another instance
+- Have a provisioned capacity & get billed for all of it (does not matter how much you use)
+- EBS Volumes are characterized in size, throughput, IOPS (I/O ops per second)
+- Throughput is a good metric for HDD (large files, infrequent read/writes) and IOPS for SSD (smaller files, many read & writes)
+  - **Throughput**: number of bits read or written per second.
+  - **IOPS**: Number of read write operations *(of clusters, not files)* per second
+- ❗ It's locked to an Availability Zone (AZ)
+  - Must be in same AZ as EC2
+  - 📝 To move, you need to first snapshot it:
+    1. Create a snapshot
+    2. Copy to another AZ
+    3. Create a volume in that AZ
+- **Pricing**
+  - You still pay for unattached EBS instances
+    - GB per month price is applicable
+- **Monitoring**
+  - 💡 Good metric: "queue depth"
+    - The queue depth is the number of pending I/O requests (from application to volume)
+    - The lower the queue length is the more IOPS you maintain
+    - The higher the queue length is the higher throughput you maintain
+- **Amazon EBS–Optimized instances**
+  - Uses optimized configuration stack and provides additional & dedicated capacity for EBS I/O
+  - 💡 Recommended to increase storage performance of an instance.
+
+#### EBS raiding
+
+- Software-based not managed by AWS
+- **RAID 0**
+  - **"Split"** gives you higher performance than single EBS.
+  - ❗ Risky, if one volume fails, entire data is corrupted but high performance.
+    - E.g. 1000 GB = 500 GB + 500 GB
+      - Free space is 1000 GB
+      - Provides IOPS of "two" 500 GB volumes improving the performance
+- **RAID 1**
+  - **"Mirror"** of your data for extra redundancy
+  - 💡 Provides high availability/redundancy.
+  - ❗ Full space is not usable,
+  - E.g. 1000 GB = 500 GB + 500 GB
+    - Free space is 500GB, the half of total amount.
+    - But has durability of "two" 500 GB volumes as data is replicated in two volumes
+- **RAID 10**
+  - Also known as **RAID 1/0**
+  - Array **"split"** and **"mirror"** combined.
+  - 💡 Combination of RAID 0 and RAID 1, gives more performance and high availability.
+  - ❗ Minimum of 4 disks are required and therefore costlier than other RAID configurations
+
+#### EBS Volume Types
+
+- **Chart**
+
+  | Attribute / API name | `gp2` | `io1` | `st1` | `sc1` |
+  |----------|-----|------|------|------|
+  | **Name** | EBS General Purpose SSD  | Provisioned IOPS SSD | Throughput Optimized HDD | Cold HDD |
+  | **Summary** | General purpose | Highest performance SSD | Low cost HDD | Lowest cost HDD |
+  | **Description** | 📝Balances price and performance | For mission-critical low-latency or high-throughput workloads | For frequently accessed, throughput-intensive workloads | Designed for less frequently accessed workloads |
+  | **Storage** | 1 GiB - 16 TiB | 4 GiB - 16 TiB | 500 GiB - 16 TiB | 500 GiB - 16 TiB |
+  | **Bursting** | ✔ Small volumes burst to 3000 IOPS | ✔ Provisioned IOPS | ✔ Up to 500 MiB/s with burst | ✔ Up to 250 MiB/s with burst |
+  | **Max throughput** | 250 MiB/s | 1,000 MiB/s | 500 MiB/s | 250 MiB/s |
+  | **Max IOPS** | 16,000 (at 5,334 GiB) | Min 100, max 32,000 (64,000 for Nitro) | 500 | 250 |
+  | **Use-cases** | Most workloads e.g. system boot volumes, virtual desktops, low-latency interactive apps, deployment & test environments | More IOPS than `gp2` limit, large databases | Streaming workloads requiring fast & consistent throughput at a low price e.g. big data, data warehouses, log processing, Apache Kafka | Large, sequential, cold data workloads e.g. data archiving, backup, file servers |
+
+- ❗ HDD disks (`st1` and `sc1`) cannot be boot volume i.e. only SSD (`gp2` & `io1`) can be boot volumes
+- **SSD vs HDD**
+
+  | Features | SSD | HDD |
+  | -------- | --- | --- |
+  | Best for workloads with | **small, random** I/O operations | **large, sequential** I/O operations |
+  | Can be used as a bootable volume ? | Yes | No |
+  | Use-cases | Transactional workloads: sustained IOPS, large databases | Large streaming workloads: Big data, data warehouses, log processing, **infrequently** accessed data |
+  | Cost | moderate / high | low |
+  | Dominant performance attribute | IOPS | Throughput MiB/s |
+
+- ❗ Max 300 TiB of aggregate PIOPS per region (provisioned IOPS for `io1`)
+
+#### EBS Availability
+
+- Stored in multiple physical volumes in the same AZ at no cost.
+- Seamless backups can be done by creating
+  - [Snapshots](#ebs-snapshots)
+  - [AMIs](./05-01-05-compute-ec2-amis.md#ec2-amis) (VM images)
+    - Snapshot + some metadata to create another instance
+  - [RAID 1 configuration](#ebs-raiding) (done manually)
+  - 💡 Use snapshots or RAID 1 instead for seamless backups.
+
+##### EBS Snapshots
+
+- Asynchronous
+  - Can be done when instance is running.
+- Incremental backups e.g. latest snapshot + changed delta are saved.
+  - 💡 Just maintain a single snapshot of the EBS volume since the latest snapshot is both incremental and complete.
+- Can be encrypted, and encrypted automatically if it's from an encrypted disk.
+- ❗ Performance may drop while snapshot is in progress
+  - Because snapshot process use IO.
+  - ❗ Shouldn't run while your application is handling a lot of traffic.
+  - 💡 Recommended to detach root volume to do snapshot but not necessary.
+- 📝 Stored in S3 (but you won't directly see them)
+- Constrained to the Region -> 💡 copy to share across region.
+- ❗ Max 100.000 snapshots per account
+- **Restoring snapshots**
+  - Challenge: EBS volumes restored by snapshots need to be pre-warmed.
+    - In Linux you can use `fio` or `dd` command to read the entire volume.
+  - **Amazon EBS fast snapshot restore (FSR)**
+    - 📝 Enables you to create a volume from a snapshot that is fully initialized at creation
+    - Eliminates the latency of I/O operations on a block when it is accessed for the first time
+    - Pricing:
+      - Billed for each minute that fast snapshot restore is enabled for a snapshot per AZ
+      - Charges are pro-rated with a minimum of one hour.
+- **Share snapshot with other accounts**
+  - Modify the permissions on the encrypted snapshot to share it with the specified account.
+  - *(If encrypted)* Share the custom key used to encrypt the volume.
+- 📝 Can make an [image (AMI)](./05-01-05-compute-ec2-amis.md#ec2-amis) from Snapshot for e.g. faster deploy on [ASG (Auto Scaling Group)](./07-03-resiliency-scalability-auto-scaling-asg.md#asg-auto-scaling-group).
+- 💡 Snapshots can be automated using [Amazon Data Lifecycle Manager](#amazon-data-lifecycle-manager).
+- 💡 If you want to copy EBS volume fast, restore from a snapshot: the disk will already be formatted and have data!
+
+##### AWS services
+
+- Include
+  - [AWS Backup](./07-04-resiliency-disaster-recovery-aws-backup.md#aws-backup)
+  - [Data Lifecycle](#amazon-data-lifecycle-manager)
+- Helps to manage and automate back-ups:
+  - They work independently from each other
+
+###### Amazon Data Lifecycle Manager
+
+- Also known as **Data Lifecycle Manager** or **DLM**
+- Helps to automate managing EBS snapshots and EBS-backed [AMIs](./05-01-05-compute-ec2-amis.md#ec2-amis)
+- You create **Lifecycle Policy** to schedule snapshots / deletion of them.
+- It's free of charge [1]
+
+#### Scalability
+
+- You can now increase capacity (GB & IOPS), or change the volume type **while in use**.
+  - No down time when resizing but need to repartition in OS to make space available.
+- ❗ You can't increase unlimitedly as EC2 has max IOPS limit of 80.000.
+- GB and IOPs goes hand in hand
+  - For increasing IOPS you need to increase GB
+    - You can't have small volume with very high IOPS
+    - You get 1 burst IOPS per 3 GB.
+  - However `io1` is an exception where you can provision IOPS independently of GB.
+    - The maximum ratio of provisioned IOPS to requested volume size (in GiB) is 50:1.
+
+#### Volume Encryption
+
+- The encryption occurs on the servers that host EC2 instances
+  - Provides encryption of data as it moves between EC2 instances and EBS storage
+  - i.e. all the data in flight moving between the instance and the volume is encrypted
+- As default:
+  - All snapshots are encrypted
+  - All volumes created from the snapshot
+  - Not encrypted (in rest) by default
+    - In settings, security can enforce "Always encrypted" per region
+- Encryption & decryption are handled transparently
+- Encryption has a minimal impact on latency
+- EBS Encryption leverages keys from KMS (AES-256)
+- A volume can be encrypted during an initial launch or:
+  - Use third party tool e.g. BitLocker & handle manually.
+  - Create an instance from launching an [image (AMI)](./05-01-05-compute-ec2-amis.md#ec2-amis) from an encrypted volume.
+- Copying an unencrypted snapshot allows encryption
+- Data in transit between an instance and an encrypted volume is also encrypted
+- **Snapshots & Encryption**
+  - Volumes created from encrypted snapshots are automatically encrypted.
+    - Snapshots of encrypted volumes are encrypted
+  - Volumes that are created from unencrypted snapshots are automatically unencrypted
+  - The encryption happens during snapshot process.
+- ❗ No direct way to encrypt an existing unencrypted volume or snapshot
+  - 💡 Turn on EBS encryption when creating the volume
+  - You can copy a snapshot & create new volume to encrypt existing unencrypted.
+  - ***Encrypt an unencrypted EBS volume***
+    1. Create an EBS snapshot of the volume
+    2. Encrypt the EBS snapshot (using copy)
+    3. Create new EBS volume from the snapshot (The volume will also be encrypted)
+    4. You can now attach the encrypted volume to the original instance
+
+### Amazon FSx
+
+- Like [EBS](#ebs-elastic-block-store) for non posix filesystems.
+- Supports third-party file systems: NetApp ONTAP, OpenZFS, Windows File Server, and Lustre
+- Highly available: Multi-AZ
+- **Amazon FSx File Gateway**
+  - Provides seamless on-premises access to Amazon FSx file
+  - Supports SMB and NFS
+- **Amazon FSx for Lustre**
+  - 📝 Purpose-built for high-performance computing (such as AI/ML on GPUs)
+  - Lustre is a standard loosely POSIX-compliant open-source file system
+  - AWS provides native S3 integration
+- **Amazon FSx for NetApp ONTAP**
+  - Supports protocols NFS, SMB, iSCSI, and NVMe-over-TCP
+    - iSCSI protocol provides block-level storage access
+  - Accessible from Windows/Linux/macOS
+  - Performance: High IOPS with low latency, SSD storage
+  - Availability: Single-AZ vs multi-AZ, backups
+- **Amazon FSx for Windows File Server**
+  - Provides file-level access via SMB/CIFS
+- 📝 Choosing for Windows:
+  - "Block storage" → FSx for NetApp ONTAP (via iSCSI)
+  - "File storage/sharing" → FSx for Windows File Server
+
+[1]: https://docs.aws.amazon.com/ebs/latest/userguide/snapshot-lifecycle.html "Amazon Data Lifecycle Manager | docs.aws.amazon.com"

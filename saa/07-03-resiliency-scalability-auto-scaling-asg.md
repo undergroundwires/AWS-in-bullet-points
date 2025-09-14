@@ -1,0 +1,194 @@
+# Scalability
+
+## Scalability Overview
+
+- Application / system can handle greater loads by adapting
+- Scalability is linked but different to high availability
+- **Elasticity**
+  - System can adapt to workload changes by provisioning and de-provisioning resources automatically to match current demand as closely as possible.
+- Two kinds of scalability
+  - **Vertical Scalability**: scale up & down
+    - Increasing the size of the instance e.g. from `t2.micro` to `t2.large`
+    - Common use case
+      - Distributed systems, such as database
+      - [RDS](./06-02-01-data-databases-rds.md), ElastiCache can scale vertically
+    - Hardware limits how much you can scale
+  - **Horizontal Scalability** (= elasticity): scale in & out
+    - Increase number of instances / systems for application
+    - Common for web applications / modern applications
+    - Easy with e.g. Amazon EC2 through right-clicking
+      - For EC2, you can use *Auto Scaling Group*s or *Load Balancer*s for horizontal scaling
+
+## Scalability vs High Availability
+
+- **Scalability**
+  - Application / system can handle greater loads by adapting
+  - Scalability is linked but different to high availability
+  - **Elasticity**
+    - System can adapt to workload changes by provisioning and de-provisioning resources automatically to match current demand as closely as possible.
+  - Two kinds of scalability
+    - **Vertical Scalability**: scale up & down
+      - Increasing the size of the instance e.g. from `t2.micro` to `t2.large`
+      - Common use case
+        - Distributed systems, such as database
+        - [RDS](./06-02-01-data-databases-rds.md), ElastiCache can scale vertically
+      - Hardware limits how much you can scale
+    - **Horizontal Scalability** (= elasticity): scale in & out
+      - Increase number of instances / systems for application
+      - Common for web applications / modern applications
+      - Easy with e.g. Amazon EC2 through right-clicking
+        - For EC2, you can use *Auto Scaling Group*s or *Load Balancer*s for horizontal scaling
+  - Improves resiliency as failing components can be easily and automatically replaced.
+- **High Availability**
+  - Goes hand in hand with horizontal scaling
+  - Running application in at least 2 data centers (= Availability Zones)
+    - Goal is to survive a data center loss
+  - Can be:
+    - Passive e.g. [RDS Multi AZ](./06-02-01-data-databases-rds.md#multi-az)
+    - Active e.g. for horizontal scaling
+  - For EC2, you can use *Auto Scaling Group* with multi AZ enabled and *Load Balancer* with multi AZ enabled.
+
+## AWS Auto Scaling Services Overview
+
+- [AWS Auto Scaling](#aws-auto-scaling) (unified service across multiple AWS services)
+- [Amazon EC2 Auto Scaling](#amazon-ec2-auto-scaling) (specifically for EC2/ASGs)
+- [Application Auto Scaling](#application-auto-scaling) (for non-EC2 services)
+- Comparison
+
+  | | [AWS Auto Scaling](#aws-auto-scaling) | [Amazon EC2 Auto Scaling](#amazon-ec2-auto-scaling) | [Application Auto Scaling](#application-auto-scaling) |
+  | - | -------------- | ----------------------- | ------------------- |
+  | Resources you can scale | EC2 Auto Scaling groups, [EC2 Fleets](./05-01-02-compute-ec2-provisioning-instance-types-launch-types-capacity-tenancy-user-data-fleet.md#ec2-fleet), ECS services, DynamoDB provisioned capacity for tables & GSIs, Aurora Replicas | EC2 Auto Scaling groups | [EC2 Fleets](./05-01-02-compute-ec2-provisioning-instance-types-launch-types-capacity-tenancy-user-data-fleet.md#ec2-fleet), ECS services, DynamoDB provisioned capacity for tables & GSIs, Aurora Replicas, [EMR clusters](./06-03-04-data-analytics-processing-emr-glue-batch-lakeformation.md#amazon-emr), Appstream 2.0 fleet, Sagemaker endpoint variants |
+  | Scaling method | Application-wide scaling using a unified interface | One Auto Scaling group at a time | One resource at a time |
+  | Predictive Scaling | Yes (EC2 Only) | No | No |
+
+## AWS Auto Scaling
+
+- Management plane that orchestrates and provides a unified interface for the underlying scaling services
+- Centralized scaling management
+- The actual scaling work is still done by:
+  - [Amazon EC2 Auto Scaling](#amazon-ec2-auto-scaling) (for [ASGs](#asg-auto-scaling-group))
+  - [Application Auto Scaling](#application-auto-scaling) (for ECS, DynamoDB, Aurora, etc.)
+
+## Amazon EC2 Auto Scaling
+
+- **Scheduled scaling**
+  - Mainly used for predictable traffic patterns
+- **Dynamic scaling**
+  - **Target tracking scaling**
+    - Based on a target value for a specific metric, e.g. CPU at 40%.
+  - **Step scaling**
+    - Based on a set of *scaling adjustments*
+    - Scaling adjustment has
+      - A lower bound for the metric value
+      - An upper bound for the metric value
+      - The amount by which to scale, based on the scaling adjustment type:
+        - **Change in capacity** e.g. increase by 5
+        - **Exact capacity** e.g. set to 5
+        - **Percent change** in capacity e.g. 10% CPU increase = 1 instance
+    - Doesn't have cooldown period limitation
+      - It can scale more aggressively than simple scaling when needed
+  - **Simple scaling**
+    - Based on a single scaling adjustment
+    - Like step scaling but has "cooldown period" during which no additional scaling activities occur
+  - ❗ Step scaling & simple scaling is only available for **EC2 Auto scaling**
+- **Predictive Scaling** uses machine learning models to forecast daily and weekly patterns.
+  - ❗ Only for EC2
+  - 💡 Good to combine with *target tracking scaling*
+    - Predictive scaling for minimum
+    - Target tracking scaling for desired
+- **Suspend and resume scaling**
+  - Temporarily pause scaling activities triggered by your scaling policies and scheduled actions.
+
+### ASG: Auto Scaling Group
+
+- Scale out (add EC2 instance) and in (remove EC2 instances) to match load.
+- Specify & ensure minimum *(scale in down to)* and maximum *(scale out up to)* of machines running.
+  - You also specify ***desired capacity***: actual size before any scale in/out rule triggers.
+- Automatically Register new instance to a load balancer
+- It's across AZ's & you can specify AZ's but ❗ region locked.
+- ***Health checks***
+  - *Own health checks*: ASG terminates unhealthy instances (based on EC2 status) and replaces them with new.
+  - *ELB health checks*: You can get health data from ELB
+- IAM roles attached to an ASG will get assigned to EC2 instances
+- ***Pricing***: ASG are free. You pay for the underlying resources being launched.
+- ASG restart if its instances get terminated to ensure always one application is running.
+- Can send SNS notifications: when instance is launched/terminated, fails to launch/terminate.
+- Components
+  - Size e.g. start with X instances.
+  - Network, subnet information.
+  - Load balancer (target group) information
+  - 📝 **Health check grace period**
+    - An EC2 instance needs to warm up before it can pass the health check.
+    - ASG waits until the health check grace period ends before checking the health status of the instance.
+    - Status checks / ELB can complete before grace period, but ASG does not act before grace period expires.
+  - You need to first create **Launch Configuration**
+    - Answers to how to launch EC2
+    - Update an ASG by providing a new launch configuration
+      - 📝 Existing EC2's are not configured, only new instances are created using updated launch configurations.
+    - Includes such as:
+      - AMI + Instance Type, EC2 User Data, EBS Volumes, Security Groups, SSH Key Pair, assign public IP or not.
+  - A **Scaling Policy**
+    - What'll trigger scale out and in
+      - E.g. can be CPU, Network, custom metrics or based on schedule.
+    - Scale between X and Y instances.
+    - When to auto-scale in or not can be based on:
+      - **Auto Scaling Alarms**
+        - Scale based on CloudWatch alarms.
+        - CloudWatch monitors metrics of instances and triggers based on threshold e.g. Average CPU.
+        - Metrics are aggregated i.e. computed for the overall ASG instances.
+        - **Auto Scaling Custom Metrics**
+          - E.g number of connected users.
+          - You send custom metrics from application on EC2 to CloudWatch (`PutMetric` API) and set & up CloudWatch alarm & use it.
+      - **Auto Scaling rules**
+        - Easier to set-up than auto scaling alarms
+        - E.g. target average CPU usage, number of requests on the ELB per instance, average network in, average network out.
+- 💡 You can attach running EC2 instances to an ASG
+- **Scaling Cooldowns**
+  - 📝 Ensures your ASG doesn't scale before the previous scaling activity takes effect (metrics goes down to normal)
+  - Flow:
+    - Auto Scaling launches new instances
+    - Cooldown starts immediately (doesn't wait for instances to be "ready")
+    - During cooldown = no new scaling decisions
+    - After cooldown = can evaluate metrics again
+  - An ASG has a default scaling cooldown
+    - You can create cooldowns that apply to a specific simple scaling policy (overrides default)
+    - You can reduce costs by terminating additional instances quickly e.g. 180 seconds cooldown instead of 300.
+    - 📝 💡 Default is `300` seconds (remember, CloudWatch default interval 5 minutes = 300 seconds)
+  - If your app is scaling up and down multiple times each hour ->
+    - Modify the ASG cool-down timers
+    - Modify CloudWatch Alarm Period that triggers the scale in.
+- **Instance termination**
+  - If any health check (EC2 or ASG) returns an unhealthy status the instance will be terminated.
+  - It will mark the instance for termination, terminate it, and then launch a replacement.
+    - I.e. it terminates existing instance before launching a replacement instance
+  - **ASG Default Termination Policy**
+    - 📝**ASG Default Termination Policy**
+      - Balances number of instances across AZ by deciding which instance gets terminated first.
+      - Priority:
+        1. Find the AZ which has the most number of instances.
+        2. Delete the one with the oldest launch configuration.
+        3. If all has same, delete the one closest to its billing hour.
+        4. If there are multiple, delete one randomly.
+      - Always terminates unhealthy instances.
+- **Rebalancing**: Auto Scaling can perform rebalancing when it finds that the number of instances across AZs is not balanced using default termination policy.
+- You can enable **Instance Protection** to protect a specific instance in an ASG from a scale in action
+- **Performing updates/changes/troubleshooting**
+  - You can **suspending** scaling processes to suspend invoking scaling processes.
+  - Set **standby state** on instance
+    - Auto scaling does not perform health checks on instances in the standby state.
+
+## Application Auto Scaling
+
+- Scaling types:
+  - **Target tracking scaling**: Based on a target value for a specific CloudWatch metric.
+  - **Step scaling**: Based on a set of scaling adjustments that vary based on the size of the alarm breach.
+  - **Scheduled scaling**: Based on the date and time.
+- Example services for auto-scaling:
+  - [ECS](./05-03-compute-containers-ecs-eks.md#ecs)
+  - [Spot Fleet](./05-01-02-compute-ec2-provisioning-instance-types-launch-types-capacity-tenancy-user-data-fleet.md#ec2-fleet)
+  - [EMR](./06-03-04-data-analytics-processing-emr-glue-batch-lakeformation.md#amazon-emr)
+  - [AppStream](./12-other-services.md#amazon-appstream)
+  - [DynamoDB](./06-02-04-data-databases-dynamodb.md)
+  - [Aurora](./06-02-03-data-databases-aurora.md)
+  - [SageMaker](./11-ai-services.md#amazon-sagemaker)
+  - Custom API-compatible APIs
